@@ -1,0 +1,65 @@
+﻿@model IEnumerable<MigDashboard.Models.QueryConfig>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>任务列表</h1>
+
+<p>
+    <a asp-action="Create">新建任务</a>
+</p>
+<table class="table row mx-0">
+    <thead>
+        <tr class="row mx-0">
+            <th class="col-1">
+                @Html.DisplayNameFor(model => model.Id)
+            </th>
+            <th class="col-2">
+                @Html.DisplayNameFor(model => model.Name)
+            </th>
+            <th class="col-2">
+                @Html.DisplayNameFor(model => model.MysqlDB)
+            </th>
+            <th class="col-3">
+                @Html.DisplayNameFor(model => model.OracleTable)
+            </th>
+            @*<th class="col-2 text-center">
+                @Html.DisplayNameFor(model => model.MysqlSQL)
+            </th>*@
+            <th class="col-2">
+                @Html.DisplayNameFor(model => model.Memo)
+            </th>
+            <th class="col-2"></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr class="row mx-0">
+                <td class="col-1">
+                    @Html.DisplayFor(modelItem => item.Id)
+                </td>
+            <td class="col-2">
+                @Html.DisplayFor(modelItem => item.Name)
+            </td>
+                <td class="col-2">
+                @Html.DisplayFor(modelItem => item.MysqlDB)
+            </td>                
+            <td class="col-3">
+                @Html.DisplayFor(modelItem => item.OracleTable)
+            @*</td>
+                <td class="col-3" style="white-space: nowrap; overflow: hidden;">
+                @Html.DisplayFor(modelItem => item.MysqlSQL)
+            </td>*@
+            <td class="col-2">
+                @Html.DisplayFor(modelItem => item.Memo)
+            </td>
+            <td class="col-2">
+                <a asp-action="Edit" asp-route-id="@item.Id">编辑</a> |
+                <a asp-action="Details" asp-route-id="@item.Id">详细</a> |
+                <a asp-action="Delete" asp-route-id="@item.Id">删除</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

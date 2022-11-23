@@ -1,0 +1,21 @@
+﻿@model IEnumerable<IEnumerable<string>>
+@{
+    ViewData["Title"] = "Privacy Policy";
+}
+<h1>数据迁移日志</h1>
+
+<hr />
+<div class="row">
+    <ul class="list-group ">
+        @for (int i = 0; i < Model.Count(); i++){
+            var classLi = i % 2 == 0 ? "list-group-item list-group-item-success "
+            : "list-group-item list-group-item-dark ";
+            <li class="@classLi" style="padding: 20px 25px">
+                @foreach(var item in Model.ElementAt(i)){
+                    @item
+                    <br />
+                }   
+            </li>
+}
+</ul>
+</div>
