@@ -1,0 +1,51 @@
+﻿@model MigDashboard.Models.QueryConfig
+
+@{
+    ViewData["Title"] = "Delete";
+}
+
+<h1>删除</h1>
+
+<h3>删除确认?</h3>
+<div>
+    <h4>任务配置</h4>
+    <hr />
+    <dl class="row">
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Name)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Name)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.MysqlDB)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.MysqlDB)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.OracleTable)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.OracleTable)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.MysqlSQL)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.MysqlSQL)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Memo)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Memo)
+        </dd>
+    </dl>
+    
+    <form asp-action="Delete">
+        <input type="hidden" asp-for="Id" />
+        <input type="submit" value="删除" class="btn btn-danger" /> |
+        <a asp-action="Index">返回列表</a>
+    </form>
+</div>
