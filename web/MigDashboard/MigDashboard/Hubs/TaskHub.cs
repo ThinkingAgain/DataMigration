@@ -6,9 +6,11 @@ namespace MigDashboard.Hubs
     public class TaskHub : Hub
     {
         public string? PythonScript { get;  }  // python脚本
+        public string? PonScript { get; }  // Pon文件处理脚本
         public TaskHub(IConfiguration configuration) : base()
         {
             PythonScript = configuration.GetSection("DBScript").Value;
+            PonScript = configuration["CMDC:PonProcessor:Script"];
         }
         public async Task StartTask(int taskId)
         {
@@ -19,5 +21,17 @@ namespace MigDashboard.Hubs
             await Clients.All.SendAsync("TaskMessage", taskId, message);*/
             //await Clients.All.SendAsync("TaskEnd", taskId);
         }
+
+        /// <summary>
+        /// 执行Pon文件处理
+        /// </summary>
+        /// <param name="taskId"></param>
+        /// <returns></returns>
+        public async Task PonProcessTask(string taskId)            
+        {
+            Process.Start("python", $"{PonScript} {taskId}");            
+        }
+
+
     }
 }

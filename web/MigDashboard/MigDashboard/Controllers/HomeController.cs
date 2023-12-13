@@ -20,6 +20,10 @@ namespace MigDashboard.Controllers
         {
             return View();
         }
+        public IActionResult PauseService()
+        {
+            return View();
+        }
 
         public IActionResult Privacy()
         {

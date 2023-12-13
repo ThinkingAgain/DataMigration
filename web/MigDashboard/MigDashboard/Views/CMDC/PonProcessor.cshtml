@@ -1,0 +1,182 @@
+﻿@using Microsoft.Extensions.FileProviders
+@model IDirectoryContents
+@{
+    ViewData["Title"] = "Pon文件处理";
+    IDirectoryContents waitingFiles = (IDirectoryContents)ViewData["waitingFiles"];
+    IDirectoryContents completedFiles = (IDirectoryContents)ViewData["completedFiles"];
+}
+<div class="v6" style="margin:0;padding-bottom:20px;font-family:Helvetica, Arial, sans-serif;font-size:14px;line-height:1.42857143;color:#333;">
+    <h1 style="display: inline-block;font-size: 20px; margin: .67em 0; font-family:inherit;font-weight:500;line-height:1.1;color:inherit;margin-top:20px;margin-bottom:10px;">
+        待处理的文件列表
+    </h1>
+    <button type="button" class="btn btn-outline-primary btn-sm mb-1 mx-2" data-bs-toggle="modal" data-bs-target="#uploadFileModal">
+        上传文件
+    </button>
+    <button id="btn-process" class="btn btn-primary btn-sm mb-1 mx-2 " onclick="excute_task()">执行处理</button>
+    
+        <table class="table table-bordered" style="border-collapse: collapse; width: 100%;">
+            <thead>
+                <tr>
+                <th >
+                       文件名
+                    </th>
+                <th >
+                        日期
+                    </th>
+                <th >
+                        大小 (KB)
+                    </th>
+                    
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var file in waitingFiles.OrderByDescending(f => f.LastModified))
+                {
+                    var size = file.Length / 1024;
+                    <tr>
+                    <td >
+                            <b>@file.Name.Trim()</b>
+                        </td>
+                        <td >
+                            @file.LastModified.DateTime.ToLocalTime().ToString("g")
+                        </td>
+                    <td  >
+                            @size.ToString("N0")
+                        </td>
+                        
+                    </tr>
+                }
+            </tbody>
+        </table>
+    
+</div>
+
+<hr class="divider"></hr>
+
+<div class="v6" style="margin:0;padding-bottom:20px;font-family:Helvetica, Arial, sans-serif;font-size:14px;line-height:1.42857143;color:#333;">
+    <h1 style="font-size: 20px; margin: .67em 0; font-family:inherit;font-weight:500;line-height:1.1;color:inherit;margin-top:20px;margin-bottom:10px;">
+        处理完的文件列表
+    </h1>
+
+
+    <table class="table table-bordered" style="border-collapse: collapse; width: 100%;">
+        <thead>
+            <tr>
+                <th>
+                    文件名
+                </th>
+                <th>
+                    日期
+                </th>
+                <th>
+                    大小 (KB)
+                </th>
+                <th>
+                    <code>可执行操作</code>
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var file in completedFiles.OrderByDescending(f => f.LastModified))
+            {
+                var size = file.Length / 1024;
+                <tr>
+                    <td>
+                        <b>@file.Name</b>
+                    </td>
+                    <td >
+                        @file.LastModified.DateTime.ToLocalTime().ToString("g")
+                    </td>
+                    <td >
+                        @size.ToString("N0")
+                    </td>
+                    <td >
+                        <a asp-action="DownCompletedFile" asp-route-fileName="@file.Name">下载</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+</div>
+
+
+
+<!-- Modal -->
+<div class="modal fade" id="uploadFileModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title fs-6" id="uploadFileModalLabel">上传Excel文件</h3>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form action="/api/hubs/files/upload"
+                      enctype="multipart/form-data" onsubmit="AJAXSubmit(this);return false;"
+                      method="post">                    
+                    <div class="mb-3">
+                        <label for="formFileSm" class="form-label">请选择上传文件</label>
+                        <input name="formFile" class="form-control form-control-sm"  id="FileUpload_FormFile" type="file">
+                    </div>
+
+                    <input class="btn btn-outline-primary  btn-sm" type="submit" value="上传" />
+                    
+                </form>
+            </div>
+           
+        </div>
+    </div>
+</div>
+
+@section Scripts {    
+
+    <script>
+        const connection = new signalR.HubConnectionBuilder().withUrl("/taskhub").build();
+        const taskButton = document.getElementById("btn-process")
+
+        connection.on("TaskStart", function (taskId) {
+            if (taskId != taskButton.id) return;
+            taskButton.disabled = true;
+        })
+        connection.on("TaskEnd", function (taskId) {
+            if (taskId != taskButton.id) return;
+            taskButton.disabled = false;
+            location.reload();
+        })
+
+        connection.on("TaskMessage", function (taskId, message) {
+            console.log(`get message: ${taskId} - ${message} `)
+            
+        })
+
+        connection.start().catch((err) => console.error(err.toString()))
+
+        
+        const excute_task = () => {
+            connection.invoke("PonProcessTask", taskButton.id).catch((err) => console.error(err.toString()))
+        }
+
+        // ============================================
+        // upload file-------
+        async function AJAXSubmit(oFormElement) {
+           const formData = new FormData(oFormElement);
+           console.log(oFormElement)
+           console.log(formData)
+
+            try {
+                const response = await fetch(oFormElement.action, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (response.ok) {
+                  location.reload()
+                }
+
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+    </script>
+}
