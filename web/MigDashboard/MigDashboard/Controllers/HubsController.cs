@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using MigDashboard.Hubs;
 using System.Drawing;
@@ -84,6 +85,20 @@ namespace MigDashboard.Controllers
             // Don't rely on or trust the FileName property without validation.
 
             return Ok(new { message = "文件上传成功" });
+        }
+
+        /// <summary>
+        /// 删除文件
+        /// </summary>
+        /// <param name="fileName">文件名</param>
+        /// /// <param name="fileType">通过此字串标示是哪个文件夹下的</param>
+        /// <returns></returns>
+        [HttpGet("files/delete")]
+        public IActionResult DeleteFileAsync(string fileName, string fileType)
+        {
+            var filePath = Path.Combine(_config[fileType], fileName);
+            System.IO.File.Delete(filePath);
+            return Ok(new { message = filePath });
         }
 
         // GET: api/<HubsController>

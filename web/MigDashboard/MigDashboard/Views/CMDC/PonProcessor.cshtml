@@ -26,6 +26,9 @@
                 <th >
                         大小 (KB)
                     </th>
+                <th>
+                    <code>可执行操作</code>
+                </th>
                     
                 </tr>
             </thead>
@@ -43,6 +46,9 @@
                     <td  >
                             @size.ToString("N0")
                         </td>
+                    <td>
+                        <a onclick="DeleteFile('@file.Name', 'CMDC:PonProcessor:WaitingFolder')" class="link-danger" href="#">删除</a>
+                    </td>
                         
                     </tr>
                 }
@@ -91,6 +97,7 @@
                         @size.ToString("N0")
                     </td>
                     <td >
+                        <a onclick="DeleteFile('@file.Name', 'CMDC:PonProcessor:CompletedFolder')" class="link-danger" href="#">删除</a>
                         <a asp-action="DownCompletedFile" asp-route-fileName="@file.Name">下载</a>
                     </td>
                 </tr>
@@ -149,10 +156,15 @@
             
         })
 
+        connection.on("RefreshPage", function () {
+            location.reload()
+        })
+
         connection.start().catch((err) => console.error(err.toString()))
 
         
         const excute_task = () => {
+            taskButton.disabled = true;
             connection.invoke("PonProcessTask", taskButton.id).catch((err) => console.error(err.toString()))
         }
 
@@ -176,6 +188,21 @@
             } catch (error) {
                 console.error('Error:', error);
             }
+        }
+
+        function DeleteFile(fileName, path) {
+           // 使用SignalR来实现
+            connection.invoke("DeleteFile", fileName, path).catch((err) => console.error(err.toString()))
+            
+            /* //使用Post API来实现-------------------
+            url = `/api/hubs/files/delete?fileName=${fileName}&fileType=${fileType}`
+            fetch(url).then(res => {
+                if (res.status === 200) {
+                    location.reload()
+                }
+            })
+                .catch(e => console.log(e))
+                */
         }
 
     </script>

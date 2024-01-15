@@ -7,10 +7,12 @@ namespace MigDashboard.Hubs
     {
         public string? PythonScript { get;  }  // python脚本
         public string? PonScript { get; }  // Pon文件处理脚本
+        private readonly IConfiguration _config;
         public TaskHub(IConfiguration configuration) : base()
         {
             PythonScript = configuration.GetSection("DBScript").Value;
             PonScript = configuration["CMDC:PonProcessor:Script"];
+            _config = configuration;
         }
         public async Task StartTask(int taskId)
         {
@@ -30,6 +32,25 @@ namespace MigDashboard.Hubs
         public async Task PonProcessTask(string taskId)            
         {
             Process.Start("python", $"{PonScript} {taskId}");            
+        }
+
+        /// <summary>
+        /// 删除文件
+        /// </summary>
+        /// <param name="fileName"></param>
+        /// <param name="confPath">配置文件中的字串, 指示是哪个目录</param>
+        /// <returns></returns>
+        public async Task DeleteFile(string fileName, string confPath)
+        {
+            try
+            {
+                File.Delete(Path.Combine(_config[confPath], fileName));
+            }
+            catch (Exception)
+            {
+               
+            }            
+            await Clients.Caller.SendAsync("RefreshPage");
         }
 
 
